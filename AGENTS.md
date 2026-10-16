@@ -965,7 +965,11 @@ They are intentionally excluded until the project demonstrates a need.
 
 ## 28. Testing Priorities
 
-At minimum, create tests for server-side game rules.
+Write unit tests continuously as features and rules are implemented or changed. Do not defer them to a final testing phase.
+
+At minimum, create tests for server-side game rules. Add or update meaningful tests alongside each change to game behavior, and run the relevant tests before considering the change complete.
+
+When fixing a bug, add a regression test where practical. Keep tests focused on observable behavior and avoid tests that merely repeat implementation details.
 
 Prioritize tests for:
 
@@ -1059,3 +1063,13 @@ Polish the interaction second.
 Integrate external music services only after the core loop is stable.
 
 Do not let third-party APIs dictate the internal game architecture.
+
+---
+
+## 33. Git Ignore Maintenance
+
+Keep a root `.gitignore` in the repository and update it whenever new tools or features create local files that should not be committed.
+
+Ignore dependencies, generated builds, test coverage, local runtime data, logs, temporary files, and files containing secrets. Keep source code, tests, lockfiles, curated song data, and safe example configuration files trackable.
+
+Review `.gitignore` as part of each relevant implementation change. Do not rely on it to remove files that are already tracked by Git.

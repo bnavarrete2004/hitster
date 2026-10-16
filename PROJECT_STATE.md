@@ -4,9 +4,9 @@
 
 Working title: Music Timeline Game
 
-Status: Research and architecture phase
+Status: Phase 0 prototype implemented and build verified; browser and touch QA pending
 
-Last major decision: Initial technical architecture defined.
+Last major decision: Started the local React card-interaction prototype with mock songs.
 
 ---
 
@@ -34,12 +34,12 @@ The visual target is a polished online card-game experience similar to the physi
 Current phase:
 
 ```text
-RESEARCH / ARCHITECTURE
+PHASE 0 — CARD PHYSICS PROTOTYPE (IMPLEMENTED, BUILD VERIFIED)
 ```
 
-No final implementation has been selected beyond the architecture documented below.
+The repository now contains a React/TypeScript/Vite client with Tailwind, dnd-kit, Motion, a fake song deck, insertion slots, card reveal, local scoring feedback, and animated correction of wrong placements. Pointer, touch, and button selection are implemented. The five local rule unit tests pass with Node.js 24.
 
-The next development milestone should be a card-physics prototype using fake song data.
+Dependencies are installed and locked in `package-lock.json`. `npm run build` passes TypeScript checking and produces the Vite production build. Browser interaction and touch behavior have not yet been visually verified. Phase 1 server rules and multiplayer have not started.
 
 ---
 
@@ -297,15 +297,16 @@ Known constraints:
 - Web Playback SDK requires Spotify Premium
 - 30-second preview URLs should not be treated as reliable
 - deprecated preview behavior exists
-- provider usage policies must be respected
+- Spotify's Developer Policy explicitly prohibits games and trivia quizzes that use the Spotify Platform
+- Spotify playback also requires visible metadata and cover art, conflicting with a hidden-answer round
 
 Status:
 
 ```text
-CANDIDATE
+NOT SUITABLE FOR INTEGRATION INTO THIS GAME UNDER CURRENT DEVELOPER POLICY
 ```
 
-Not selected.
+Premium subscriptions do not remove this restriction. Reassess only if Spotify grants explicit permission or changes its policy.
 
 ### Apple Music
 
@@ -341,6 +342,8 @@ Problems:
 - player visibility and provider policy requirements
 - metadata may reveal the answer
 - undesirable dependency on visible YouTube UI for hidden-song gameplay
+- YouTube policies prohibit hidden/background players and isolating the audio from video
+- The documented IFrame Player API concerns YouTube video playback; no official YouTube Music account playback integration has been selected
 
 Status:
 
@@ -349,6 +352,16 @@ NOT PREFERRED FOR FINAL GAMEPLAY
 ```
 
 May still be useful for experiments.
+
+The YouTube player cannot be hidden to preserve the answer. YouTube Music Premium does not by itself solve that conflict.
+
+Official sources reviewed on 2026-10-16:
+
+- Spotify Developer Policy: https://developer.spotify.com/policy
+- Spotify Compliance Tips: https://developer.spotify.com/compliance-tips
+- YouTube IFrame Player API: https://developers.google.com/youtube/iframe_api_reference
+- YouTube API Services Developer Policies: https://developers.google.com/youtube/terms/developer-policies
+- YouTube Data API reference: https://developers.google.com/youtube/data/reference/rest
 
 ### Legacy iTunes previews
 
@@ -431,6 +444,8 @@ The server owns:
 - validation
 - reveal timing
 - next-turn transition
+
+Approved planning decision: each player has a personal chronological timeline. The catalog's song metadata and the method of audio playback are separate concerns. The exact listening topology remains undecided.
 
 ---
 
@@ -790,7 +805,7 @@ NOT REQUIRED
 Status:
 
 ```text
-NEXT PHASE
+IMPLEMENTED — BUILD VERIFIED, BROWSER AND TOUCH QA PENDING
 ```
 
 ---
@@ -812,7 +827,7 @@ Implement:
 Status:
 
 ```text
-NOT STARTED
+NOT STARTED — CLIENT PROTOTYPE HAS LOCAL RULE SIMULATION ONLY
 ```
 
 ---
@@ -960,25 +975,14 @@ Which provider will be used for the final playable catalog?
 
 Candidates:
 
-- Spotify
 - Apple Music
 - another properly licensed source
 
+Spotify integration is excluded under the current Developer Policy's game prohibition. This remains a provider constraint for remote private games.
+
 ### Playback topology
 
-Possible options:
-
-```text
-host-only playback
-```
-
-or:
-
-```text
-every client plays synchronized audio
-```
-
-Host-only playback is currently the simpler direction.
+All players will join remotely through ngrok. Whether each client plays authorized audio independently or a different listening method is used remains undecided. Synchronized playback and hidden-answer handling must be evaluated together.
 
 ### Match objective
 
@@ -991,12 +995,7 @@ Not yet decided:
 
 ### Timeline ownership
 
-Not yet finalized:
-
-- each player has a personal timeline
-- all players share one timeline
-
-The original concept appears compatible with player-specific timelines, but this must be explicitly decided before implementing final rules.
+Decided: each player has a personal timeline.
 
 ### Starting cards
 
@@ -1018,33 +1017,9 @@ Multiplayer reconnection behavior has not yet been designed.
 
 ## 27. Immediate Next Step
 
-Build Phase 0.
+Verify the card interaction in a desktop browser and on a touch device. Then begin Phase 1 game rules with tests, keeping final validation and scoring on the server when multiplayer is introduced.
 
-Use fake songs and fake years.
-
-Recommended example dataset:
-
-```ts
-[
-  { id: "a", title: "Mock A", releaseYear: 1965 },
-  { id: "b", title: "Mock B", releaseYear: 1977 },
-  { id: "c", title: "Mock C", releaseYear: 1986 },
-  { id: "d", title: "Mock D", releaseYear: 1998 },
-  { id: "e", title: "Mock E", releaseYear: 2014 }
-]
-```
-
-The prototype should prove:
-
-- card pickup feels physical
-- insertion gap is clear
-- timeline cards move smoothly
-- dropping is predictable
-- incorrect cards can animate to another position
-- card flip works
-- touch interaction is viable
-
-Do not integrate Spotify, Apple Music, Billboard data, authentication, or persistence before this prototype proves the main interaction.
+Do not integrate Spotify, Apple Music, Billboard data, authentication, or persistence before the prototype interaction is verified.
 
 ---
 
@@ -1062,13 +1037,15 @@ dnd-kit
 Node.js
 Express
 Socket.IO
-ngrok
+private LAN access
 server-authoritative game logic
 MusicProvider abstraction
 local test audio during development
 Billboard Top 10 Year-End catalog concept
 1960–2024 range
 releaseYear timeline ordering
+personal timeline per player
+song catalog separated from audio playback
 ```
 
 Not selected yet:
@@ -1078,20 +1055,28 @@ final music provider
 final database requirement
 win condition
 starting-card rule
-timeline ownership model
 reconnection behavior
 final visual identity
+```
+
+Implemented locally:
+
+```text
+Phase 0 client source
+mock song deck and timeline
+drag and drop insertion
+flip and correction animation
+local placement rule tests
 ```
 
 Not started:
 
 ```text
-codebase
 multiplayer
 catalog import
 music integration
 ngrok testing
-production build
+browser and touch QA
 ```
 
 ---
